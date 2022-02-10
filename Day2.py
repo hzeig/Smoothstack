@@ -35,20 +35,23 @@ else:
     pass
 
 
-def isPalindrome(string):
-    new_string = string.lower()
-    new_string = new_string.translate(str.
-                maketrans('','', string.punctuation))
+def isPalindrome(phrase):
+    new_string = phrase.lower().replace(' ', '').translate(str.
+                    maketrans('','', string.punctuation))
     if new_string == new_string[::-1]:
-        return [True if new_string ==  else False]
+        return True
+    else:
+        return False
 
 
-result = ['Y' for x in phraseList if isPalindrome(x) else 'N']
-# result = phraseList
+# result = ['Y' for x in phraseList if isPalindrome(x) else 'N']
+result = list(map(lambda x: isPalindrome(x), phraseList))
 
-print(result)
+print(phraseList, result)
 
 
 
 # assignment b
+# %%
+
 # %%
