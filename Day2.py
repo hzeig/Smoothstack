@@ -39,9 +39,9 @@ def isPalindrome(phrase):
     new_string = phrase.lower().replace(' ', '').translate(str.
                     maketrans('','', string.punctuation))
     if new_string == new_string[::-1]:
-        return True
+        return 'Y'
     else:
-        return False
+        return 'N'
 
 
 # result = ['Y' for x in phraseList if isPalindrome(x) else 'N']
