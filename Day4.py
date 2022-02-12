@@ -170,23 +170,25 @@ def getSalesTuples(shopList):
 getSalesTuples(bookShopList)
 
 # map lambda solution
-print(list(map(lambda x: (x[0], x[2]*x[3] if (x[2]*x[3])>=100 else (x[2]*x[3] + 10)), bookShopList)))
+orderTotals = list(map(lambda x: (x[0], x[2]*x[3] if (x[2]*x[3])>=100 else (x[2]*x[3] + 10)), bookShopList))
+print(orderTotals)
 
-
-# The same bookshop, but this time we work on a different list. 
+#%% The same bookshop, but this time we work on a different list. 
 # The sublists of our lists look like this: 
 # [ordernumber, (article number, quantity, price per unit), ... (article number, quantity, price per unit) ] 
 # Write a program which returns a list of two tuples with (order number, total amount of order).
 
 
-bookShopList2 = [34587, ('Learning Python, Mark Lutz', 4, 40.95), \
-    98762, ('Programming Python, Mark Lutz', 5, 56.80),\
-         77226, ('Head First Python, Paul Barry', 3, 32.95), \
-             881122, ('Einfuhrung in Python3, Bernd Klein', 3, 24.99)]
+bookOrder = [6769,
+    (34587, 4, 40.95),
+    (98762, 5, 56.80),
+    (77226, 3, 32.95),
+    (88112, 3, 24.99)]
 
-print(list(map(lambda x: (x if int(x[0]) else, \
-    x[2]*x[3] if (x[2]*x[3])>=100 else (x[2]*x[3] + 10), bookShopList))))
+orderTotal = lambda x: (x[0], sum(t[1]*t[2] for t in x[1:]))
+print(orderTotal(bookOrder))
+
+# print(list(map(lambda x: ])))
+# else pass), x[2]*x[3] if (x[2]*x[3])>=100 else (x[2]*x[3] + 10), bookShopList))))
 
 
-
-# %%
