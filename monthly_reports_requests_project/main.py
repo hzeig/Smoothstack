@@ -1,59 +1,57 @@
 import openpyxl 
 import logging as lg
-# import datetime
+import datetime
 
-# dateObject = datetime.datetime.strptime('1-2018', '%m-%Y')
-# print(dateObject)
 
+log_format = '%(asctime)s %(message)s'
 
 # initiate log
-lg.basicConfig(filename='MonthlyReportsAccessLog.log',format='%(asctime)s %(message)s', level=lg.DEBUG)
-lg.info('Request Initiated')
+lg.basicConfig(
+    filename = 'MonthlyReportsAccessLog.log',
+    format = log_format, 
+    level = lg.DEBUG
+    )
 
-# input monthly report request
-month = input("Month:").lower()
-year = input("Year:")
-wb = openpyxl.load_workbook("MonthlyReports/expedia_report_monthly_{}_{}.xlsx".format(month, year))
-ws = wb['Summary Rolling MoM']
+def getReport(month, year):
+    # log request
+    lg.info('Request Initiated')
 
-# function to gather data
-def getRequest(month, year):
+    # input monthly report request
+    dateStr = '{}-{}'.format(month[0:3], year)
+    lg.info('Date Input: {}'.format(dateStr))
+
     wb = openpyxl.load_workbook("MonthlyReports/expedia_report_monthly_{}_{}.xlsx".format(month, year))
     ws = wb['Summary Rolling MoM']
-    dateStr = '{},{}'.format(month, year)
+    lg.info('Workbook Activated')
+
     labels = ['Month, Year']
-    values = [dateStr]
+    values = ['{},{}'.format(month, year)]
     # get labels
     for cell in ws['1']:
         if cell.value is not None:
             labels.append(cell.value)
         else:
             pass
-    for row in ws.iter_rows(30):
-        # search rows for labels and requested month 
+    for row in ws.iter_rows(min_row=2, max_row=30, min_col=1, max_col=30):
+        # # search rows for labels and requested month 
         for cell in row:
             # get values
-            if cell.value is None:
-                pass
-            elif cell.value.strftime("%B, %Y") == dateStr:
-                for data in ws.iter_col(row):
+            if cell.value is not None and str(cell.value).lower() == dateStr:
+                for data in ws[row]:
                     if data.value is not None:
                         values.append(data.value)
             else:
                 pass
     zipped = zip(labels, values)
     lg.info('Information Retrieved')
-    return print(dict(zipped))
 
-# function to print data
-def printRequest(zippedData):
-    data = dict(zippedData)
-    for item in data:
-        print('{}: {}'.format(item[0], item[1]))
-    return lg.info('Information Printed')
+    data = dict(zipped)
+    for key, value in data.items():
+        print('{}: {}'.format(key, value))
+    lg.info('Information Printed')
+    lg.info('Request Complete')
 
 
-lg.info('Request Sent')
-zipped = getRequest(month,year)
-printRequest(zipped)
-lg.info('Request Complete')
+month = input("Enter month name: (i.e. January)").lower()
+year = input("Enter year: (i.e. 2014)")
+getReport(month, year)
