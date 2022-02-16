@@ -1,13 +1,14 @@
-import openpyxl 
+import pandas as pd
 import logging as lg
 import datetime
 
 
 log_format = '%(asctime)s %(message)s'
+log_name = 'MonthlyReportsAccessLog.log'
 
 # initiate log
 lg.basicConfig(
-    filename = 'MonthlyReportsAccessLog.log',
+    filename = log_name,
     format = log_format, 
     level = lg.DEBUG
     )
@@ -17,41 +18,35 @@ def getReport(month, year):
     lg.info('Request Initiated')
 
     # input monthly report request
-    dateStr = '{}-{}'.format(month[0:3], year)
-    lg.info('Date Input: {}'.format(dateStr))
+    # date_str = '{},{}'.format(month, year)
+    datetime_obj = datetime.datetime.strptime(month+"-"+year, "%B-%Y")
+    lg.info('Date Requested: {}'.format(datetime_obj))
 
-    wb = openpyxl.load_workbook("MonthlyReports/expedia_report_monthly_{}_{}.xlsx".format(month, year))
-    ws = wb['Summary Rolling MoM']
-    lg.info('Workbook Activated')
+    filename = "MonthlyReports/expedia_report_monthly_{}_{}.xlsx".format(month, year)
+    lg.debug('Opening file {}'.format(filename))
 
-    labels = ['Month, Year']
-    values = ['{},{}'.format(month, year)]
-    # get labels
-    for cell in ws['1']:
-        if cell.value is not None:
-            labels.append(cell.value)
-        else:
-            pass
-    for row in ws.iter_rows(min_row=2, max_row=30, min_col=1, max_col=30):
-        # # search rows for labels and requested month 
-        for cell in row:
-            # get values
-            if cell.value is not None and str(cell.value).lower() == dateStr:
-                for data in ws[row]:
-                    if data.value is not None:
-                        values.append(data.value)
-            else:
-                pass
-    zipped = zip(labels, values)
-    lg.info('Information Retrieved')
+    report_df = pd.read_excel(
+        filename, 
+        sheet_name="Summary Rolling MoM",
+        engine="openpyxl"
+        )
+    lg.info('File opened')
 
-    data = dict(zipped)
-    for key, value in data.items():
-        print('{}: {}'.format(key, value))
+
+    lg.debug('Formatting to Pandas DataFrame')
+    labels = [column for column in report_df.columns if column[:7] != 'Unnamed:']
+    datein_df = report_df[report_df.eq(datetime_obj).any(1)].dropna(1)
+
+    print(datein_df)
+    
+    # final_df = 
+
     lg.info('Information Printed')
+    print("Report for {}, {}:".format(month, year))
+    # print(final_df)
     lg.info('Request Complete')
 
 
-month = input("Enter month name: (i.e. January)").lower()
-year = input("Enter year: (i.e. 2014)")
+month = input("Enter month name (i.e. January):").lower()
+year = input("Enter year (i.e. 2018):")
 getReport(month, year)
