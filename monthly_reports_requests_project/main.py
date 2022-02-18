@@ -33,16 +33,52 @@ def getReport(month, year):
     lg.info('File opened')
 
 
-    lg.debug('Formatting to Pandas DataFrame')
-    labels = [column for column in report_df.columns if column[:7] != 'Unnamed:']
+    lg.debug('Collecting Report Features')
+    # Collecting item labels, excluding headers 'Unnamed: #'
+    labels = [column for column in report_df.columns if column[0] != 'U'] 
+    
+    lg.info('Finding Column with Datetime Object')
+    date_col = report_df.dtypes[report_df.dtypes == object]
+    col_name = list(date_col.index)
+    dates_df = pd.to_date_time(report_df[col_name])
+
+    lg.info('Searching Datetime Column for Requested Date')
+    for name, item in dates_df.iterrows():
+        print(item.dt.month)
+    
+    # for index in range(dates_df.shape[0]):            
+    #     item = dates_df.iloc[index,:]
+    #     print(type(item))
+    #     print(item)
+        #     print(item)
+        #     # if item.month == month:
+        #         # values = report_df.iloc[:,index]
+        # else:
+            # pass
+    
+
+   # print(values)
+    # condition = [item for item in dates_df if item.month == datetime_obj]
+    # report_df.loc[]
+            # if item.month == month and item.year == year:
+            #     row = item.index
+            
+    # print(row)
+
+        # else:
+        #     values = report_df[[labels]][i]
+        #     return values
+
+
+
+    lg.debug('Collecting Report Statistics')
     datein_df = report_df[report_df.eq(datetime_obj).any(1)].dropna(1)
 
-    print(datein_df)
     
     # final_df = 
 
     lg.info('Information Printed')
-    print("Report for {}, {}:".format(month, year))
+    # print("Report for {}, {}:".format(month, year))
     # print(final_df)
     lg.info('Request Complete')
 
