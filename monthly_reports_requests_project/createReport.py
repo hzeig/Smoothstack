@@ -1,6 +1,6 @@
 from checkFile import checkFile
 from summaryReport import summaryReport
-from promoterReport import promoterReport
+from vocReport import promoterReport
 
 def createReport(path):
 

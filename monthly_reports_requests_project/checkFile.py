@@ -12,7 +12,7 @@ lg.basicConfig(
     level = lg.DEBUG
     )
 
-
+# defining errors and exceptions
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -26,7 +26,7 @@ class DuplicateError(Error):
         and is listed in file.lst"""
 
 
-
+# function to check file is valid for processing
 def checkFile(path):
     lg.info("Checking file for processing.")
 
@@ -56,7 +56,6 @@ def checkFile(path):
         for key in month_dict:
             if key in filename:
                 month = key
-                month_val = month_dict[key]
         
         # extract year from title, error check formatting
         year = int(''.join(list(filter(str.isdigit, filename))))
@@ -85,7 +84,7 @@ def checkFile(path):
                     else: pass
                 else: pass
 
-        return month, month_val, year
+        return month, year
         
     except UnboundLocalError:
         lg.error("UnboundLocalError: File MONTH is not in expected format. Moving to error folder.")

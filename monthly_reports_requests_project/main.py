@@ -3,7 +3,7 @@ import logging as lg
 import os
 from checkFile import checkFile
 from summaryReport import summaryReport
-from promoterReport import promoterReport
+from vocReport import vocReport
 
 
 
@@ -57,15 +57,15 @@ def createReport(path):
     try:
         # check file formatting
         if checkFile(path):
-            month, month_val, year = checkFile(path)
-            date_obj = [month, month_val, year]
+            month, year = checkFile(path)
+            date_obj = [month, year]
         else:
             raise CheckFailError
         
         # collect report data
-        if summaryReport(path, date_obj) and promoterReport(path, date_obj):
+        if summaryReport(path, date_obj) and vocReport(path, date_obj):
             summary = summaryReport(path, date_obj)
-            promoters = promoterReport(path, date_obj)
+            voc = vocReport(path, date_obj)
         else:
             raise ReportFailError
 
@@ -74,8 +74,8 @@ def createReport(path):
         reportname = "report_{}_{}.txt".format(month, year)
         with open(reportname, "a") as report:
             report.writelines("Full Report for {}, {}".format(month.capitalize(), year))
-            report.writelines("\n" + summary)
-            report.writelines("\n" + promoters)
+            report.writelines("\n\n" + summary)
+            report.writelines("\n" + voc)
         report.close()
         lg.debug("Complete report {} now available.".format(reportname))
 

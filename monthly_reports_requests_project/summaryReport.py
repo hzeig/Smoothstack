@@ -4,7 +4,7 @@ import datetime
 from time import strftime
 import openpyxl 
 
-
+# defining errors and exceptions
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -17,7 +17,7 @@ class DataMissingError(Error):
     """Raised when some part of data not found."""
 
 
-
+# data gathering and report formatting function
 def summaryReport(path, date_obj):
     wb = openpyxl.load_workbook(path) 
     lg.info("Opened file workbook.")
@@ -26,7 +26,7 @@ def summaryReport(path, date_obj):
     lg.info("Opened worksheet 'Summary Rolling Mom'.")
     
     lg.info("Gathering report data.")
-    reg_date_format = "{}, {}".format(date_obj[0], date_obj[2])
+    reg_date_format = "{}, {}".format(date_obj[0], date_obj[1])
     data = []
     try:
         lg.info("Locating file date.")
@@ -57,7 +57,7 @@ def summaryReport(path, date_obj):
         
         return report
 
-    except DateMissingError:
+    except UnboundLocalError:
         lg.error("DateMissingError: Date from file name not found in file.")
 
     except DataMissingError:

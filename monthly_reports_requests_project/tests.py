@@ -41,8 +41,14 @@ filename = 'MonthlyReports\expedia_report_monthly_march_2018.xlsx'
 # reg_date_format = "{}-{}".format(date_obj[0][:3], year)
 # print(reg_date_format)
 
+# from checkFile import checkFile
+# from summaryReport import summaryReport
+# month, year = checkFile(filename) 
+# date_obj = [month, year]
+# summaryReport(filename, date_obj)
+
 from checkFile import checkFile
-from summaryReport import summaryReport
-month, val, year = checkFile(filename) 
-date_obj = [month, val, year]
-summaryReport(filename, date_obj)
+from vocReport import vocReport
+month, year = checkFile(filename) 
+date_obj = [month, year]
+vocReport(filename, date_obj)
