@@ -1,10 +1,7 @@
-from distutils.log import error
+# from distutils.log import error
 import logging as lg
 import os
-import shutil
-import pandas as pd
-import openpyxl
-import datetime
+from checkFile import checkFile
 from summaryReport import summaryReport
 from promoterReport import promoterReport
 
@@ -19,33 +16,6 @@ lg.basicConfig(
     format = log_format, 
     level = lg.DEBUG
     )
-
-
-
-def createReport(filename):
-
-
-
-
-    with open("file.lst", "a") as lst_file:
-        lst_file.writelines("\n" + filename)
-        lst_file.close()
-
-
-
-
-class Error(Exception):
-    """Base class for other exceptions"""
-    pass
-
-class FileNameError(Error):
-    """Raised when file format is incorrect"""
-    pass
-
-class DuplicateError(Error):
-    """Raised when file has already been processed \
-        and is listed in file.lst"""
-
 
 ########################### REPORT REQUEST FUNCTIONS #######################
 
@@ -66,173 +36,52 @@ class DuplicateError(Error):
 # Print full report into .txt file 
 # Append file name to file.lst
 
+class Error(Exception):
+    """Base class for other exceptions"""
+    pass
 
-def getInfo(filename):
-    lg.info("getInfo() Function Start")
+class CheckFailError(Error):
+    """Raised when file fails checks."""
+    pass
 
-    month_dict = {
-        "january":  1,
-        "february": 2,
-        "march":    3,
-        "april":    4,
-        "may":      5,
-        "june":     6,
-        "july":     7,
-        "august":   8,
-        "september":9,
-        "october":  10,
-        "november": 11,
-        "december": 12
-    }
-
-    error_directory = "ErrorFiles"
+class ReportFailError(Error):
+    """Raised when data extraction for reports fails."""
 
 
-    #### check file formatting ###
+def createReport(path):
+
+    filename = path.split("\\")[1]
+
     try:
-        # extract month from title, error check formatting
-        for key in month_dict:
-            if key in filename:
-                month = key
-                month_val = month_dict[key]
-        
-        # extract year from title, error check formatting
-        year = int(''.join(list(filter(str.isdigit, filename))))
-        if len(str(year)) != 4 or str(year)[:2] != '20':
-            raise FileNameError
-
-        # error check general formatting
-        accepted_format = "MonthlyReports\expedia_report_monthly_{}_{}.xlsx".\
-            format(month, year)
-        if filename == accepted_format:
-            lg.info("File is in expected format")
-            pass
+        if checkFile(path):
+            pass            
         else:
-            lg.debug("File Name:{} \nExpected Format:{}".format(filename, accepted_format))
-            raise FileNameError
+            raise CheckFailError
         
-        # error check if file in file.lst
-        if os.path.exists("file.lst"):
-            with open("file.lst", "r") as lst_file:
-                if os.stat("file.lst").st_size != 0: 
-                    contents = lst_file.read()
-                    if filename in contents:
-                        lg.debug("File '{}' has been already processed".format(filename))
-                        raise DuplicateError
-                    else: pass
-                else: pass
-
-        ### opening file ###
-        
-        # obtaining dataframes from workbook tabs
-        summary_df = pd.read_excel(
-            filename, 
-            sheet_name="Summary Rolling MoM",
-            engine="openpyxl"
-            )
-        lg.info('Summary report file opened.')
-        
-        promoter_df = pd.read_excel(
-            filename, 
-            sheet_name="VOC Rolling MoM",
-            engine="openpyxl"
-            )
-        lg.info('Summary report file opened.')
-
-        ### Summary Report ###
-        wb = openpyxl.load_workbook(filename)
-        ws = wb.worksheets
-        print(ws)
+        summary = summary(report)
 
         
-
-
-        ### 
-
         with open("file.lst", "a") as lst_file:
             lst_file.writelines("\n" + filename)
-            lst_file.close()
+        lst_file.close()
+        
 
-    except UnboundLocalError:
-        lg.info("File MONTH is not in expected format. Moving to error folder.")
-        if not os.path.exists(error_directory):
-            os.mkdir(error_directory)
-        shutil.move(filename, error_directory)
-        lg.info("File moved to error folder.")
-            
 
-    except FileNameError:
-        lg.info("File NAME is not in expected format. Moving to error folder.")
-        if not os.path.exists(error_directory):
-            os.mkdir(error_directory)
-        shutil.move(filename, error_directory)
-        lg.info("File moved to error folder.")
+    except CheckFailError: 
+        lg.error("CheckFileError: File did not pass checks. Moved to error folder.")
     
-    except DuplicateError:
-        lg.info("File has already been processed.")
-        lg.info("Skipping report.")        
+    except ReportFailError:
+        lg.error("ReportFailError: Unable to extract data for report due to file formatting.")
 
 
+    # with open("Key_Data_{}.txt".format(), "a") as lst_file:
+    #     lst_file.writelines(summary)
+    #     lst_file.writelines(promoters)
+    #     lst_file.close()    
 
-#     # input monthly report request
-#     # date_str = '{},{}'.format(month, year)
-#     datetime_obj = datetime.datetime.strptime(month+"-"+year, "%B-%Y")
-#     lg.info('Date Requested: {}'.format(datetime_obj))
-
-#     # list of processed files
-#     # file_lst =  
-
-
-
-
-#     lg.debug('Collecting Report Features')
-#     # Collecting item labels, excluding headers 'Unnamed: #'
-#     labels = [column for column in report_df.columns if column[0] != 'U'] 
-    
-#     lg.info('Finding Column with Datetime Object')
-#     date_col = report_df.dtypes[report_df.dtypes == object]
-#     col_name = list(date_col.index)
-#     dates_df = pd.to_date_time(report_df[col_name])
-
-#     lg.info('Searching Datetime Column for Requested Date')
-#     for name, item in dates_df.iterrows():
-#         print(item.dt.month)
-    
-#     # for index in range(dates_df.shape[0]):            
-#     #     item = dates_df.iloc[index,:]
-#     #     print(type(item))
-#     #     print(item)
-#         #     print(item)
-#         #     # if item.month == month:
-#         #         # values = report_df.iloc[:,index]
-#         # else:
-#             # pass
     
 
-#    # print(values)
-#     # condition = [item for item in dates_df if item.month == datetime_obj]
-#     # report_df.loc[]
-#             # if item.month == month and item.year == year:
-#             #     row = item.index
-            
-#     # print(row)
 
-#         # else:
-#         #     values = report_df[[labels]][i]
-#         #     return values
-
-
-
-#     # lg.debug('Collecting Report Statistics')
-#     # datein_df = report_df[report_df.eq(datetime_obj).any(1)].dropna(1)
-
-    
-#     # final_df = 
-
-#     lg.info('Information Printed')
-#     # print("Report for {}, {}:".format(month, year))
-#     # print(final_df)
-    lg.info('getInfo() Function End')
 
 
 ###################### REPORT REQUEST PROGRAM ##################################
@@ -245,9 +94,9 @@ if request_ask == 'y' or request_ask == 'yes':
     filename = input("Full file name:") 
     lg.info("Specific Report Request for File: {}".format(filename))
     print("Requesting report for file: {}".format(filename))
-    file = os.path.join(directory, filename)
-    if os.path.isfile(file):
-        getInfo(file)
+    path = os.path.join(directory, filename)
+    if os.path.isfile(path):
+        createReport(path)
         lg.info('File Processed')
         print("Request Complete")
     else:
@@ -259,9 +108,9 @@ elif request_ask == 'n' or request_ask == 'no' or request_ask == '':
     counter = 0
     total = len([item for item in os.listdir('MonthlyReports')])
     for filename in os.listdir(directory):
-        file = os.path.join(directory, filename)
-        if os.path.isfile(file):
-            getInfo(file)
+        path = os.path.join(directory, filename)
+        if os.path.isfile(path):
+            createReport(path)
             counter += 1
             lg.info('File {}/{} Processed'.format(str(counter), str(total)))
         else:
