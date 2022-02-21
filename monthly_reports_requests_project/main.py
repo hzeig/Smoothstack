@@ -3,8 +3,11 @@ import logging as lg
 import os
 import shutil
 import pandas as pd
-# import openpyxl
+import openpyxl
 import datetime
+from summaryReport import summaryReport
+from promoterReport import promoterReport
+
 
 
 log_format = '%(asctime)s %(message)s'
@@ -16,6 +19,20 @@ lg.basicConfig(
     format = log_format, 
     level = lg.DEBUG
     )
+
+
+
+def createReport(filename):
+
+
+
+
+    with open("file.lst", "a") as lst_file:
+        lst_file.writelines("\n" + filename)
+        lst_file.close()
+
+
+
 
 class Error(Exception):
     """Base class for other exceptions"""
@@ -46,6 +63,7 @@ class DuplicateError(Error):
 #       - search first by datetime, then by string
 #       - if more than one month exists, check for year (if no year, raise formatting error)
 #   b. 
+# Print full report into .txt file 
 # Append file name to file.lst
 
 
@@ -86,26 +104,27 @@ def getInfo(filename):
         # error check general formatting
         accepted_format = "MonthlyReports\expedia_report_monthly_{}_{}.xlsx".\
             format(month, year)
-        lg.debug("File Name:{} \nExpected Format:{}".format(filename, accepted_format))
         if filename == accepted_format:
-            lg.info("File is in'VOC Rolling MoM' expected format")
+            lg.info("File is in expected format")
             pass
         else:
+            lg.debug("File Name:{} \nExpected Format:{}".format(filename, accepted_format))
             raise FileNameError
         
         # error check if file in file.lst
-        with open("file.lst", "r") as lst_file:
-            if os.stat("file.lst").st_size != 0: 
-                contents = lst_file.read()
-                if filename in contents:
-                    lg.debug("File '{}' has been already processed".format(filename))
-                    raise DuplicateError
+        if os.path.exists("file.lst"):
+            with open("file.lst", "r") as lst_file:
+                if os.stat("file.lst").st_size != 0: 
+                    contents = lst_file.read()
+                    if filename in contents:
+                        lg.debug("File '{}' has been already processed".format(filename))
+                        raise DuplicateError
+                    else: pass
                 else: pass
-            else: pass
 
         ### opening file ###
         
-        # obtaining dataframes from various tabs#
+        # obtaining dataframes from workbook tabs
         summary_df = pd.read_excel(
             filename, 
             sheet_name="Summary Rolling MoM",
@@ -113,8 +132,6 @@ def getInfo(filename):
             )
         lg.info('Summary report file opened.')
         
-        print(summary_df)
-
         promoter_df = pd.read_excel(
             filename, 
             sheet_name="VOC Rolling MoM",
@@ -122,11 +139,15 @@ def getInfo(filename):
             )
         lg.info('Summary report file opened.')
 
-        print(promoter_df)
+        ### Summary Report ###
+        wb = openpyxl.load_workbook(filename)
+        ws = wb.worksheets
+        print(ws)
 
-        # report task for 'Summary Rolling MoM' 
+        
 
-        # report task for 'VOC Rolling MoM'
+
+        ### 
 
         with open("file.lst", "a") as lst_file:
             lst_file.writelines("\n" + filename)
