@@ -19,7 +19,6 @@ lg.basicConfig(
 
 ########################### REPORT REQUEST FUNCTIONS #######################
 
-
 #### TO DO (info and debug log for everything)
 # Check file formatting --> if incorrect raise exception 
 # Open or create file.lst
@@ -56,23 +55,39 @@ def createReport(path):
     filename = path.split("\\")[1]
 
     try:
+        # check file formatting
         if checkFile(path):
             month, month_val, year = checkFile(path)
             date_obj = [month, month_val, year]
         else:
             raise CheckFailError
+        
+        # collect report data
+        if summaryReport(path, date_obj) and promoterReport(path, date_obj):
+            summary = summaryReport(path, date_obj)
+            promoters = promoterReport(path, date_obj)
+        else:
+            raise ReportFailError
 
-        
-        
-        summary = summaryReport(path, date_obj)
-        promoters = promoterReport(path, date_obj)
+        # create report file
+        lg.info("Creating report file.")
+        reportname = "report_{}_{}.txt".format(month, year)
+        with open(reportname, "a") as report:
+            report.writelines("Full Report for {}, {}".format(month.capitalize(), year))
+            report.writelines("\n" + summary)
+            report.writelines("\n" + promoters)
+        report.close()
+        lg.debug("Complete report {} now available.".format(reportname))
 
-        
+        # track file as processed
+        lg.info("Saving name of processed file to tracker 'file.lst'.")
         with open("file.lst", "a") as lst_file:
             lst_file.writelines("\n" + filename)
         lst_file.close()
-        
+        lg.info("Tracking complete.")
 
+        # done
+        lg.info("Process complete.")
 
     except CheckFailError: 
         lg.error("CheckFileError: File did not pass checks. Moved to error folder.")
@@ -80,13 +95,6 @@ def createReport(path):
     except ReportFailError:
         lg.error("ReportFailError: Unable to extract data for report due to file formatting.")
 
-
-    # with open("Key_Data_{}.txt".format(), "a") as lst_file:
-    #     lst_file.writelines(summary)
-    #     lst_file.writelines(promoters)
-    #     lst_file.close()    
-
-    
 
 
 

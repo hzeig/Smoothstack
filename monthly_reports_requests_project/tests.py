@@ -45,4 +45,4 @@ from checkFile import checkFile
 from summaryReport import summaryReport
 month, val, year = checkFile(filename) 
 date_obj = [month, val, year]
-print(summaryReport(filename, date_obj))
+summaryReport(filename, date_obj)
