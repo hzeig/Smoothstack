@@ -1,4 +1,4 @@
 
 
-def promoterReport():
-    print("blah")
+def promoterReport(path):
+    return

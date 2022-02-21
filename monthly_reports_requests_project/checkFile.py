@@ -13,7 +13,6 @@ lg.basicConfig(
     )
 
 
-
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -27,7 +26,8 @@ class DuplicateError(Error):
         and is listed in file.lst"""
 
 
-def checkFile(filename):
+
+def checkFile(path):
     lg.info("Checking file for processing.")
 
     month_dict = {
@@ -47,7 +47,9 @@ def checkFile(filename):
 
     error_directory = "ErrorFiles"
     
-    
+    split = path.split("\\")
+    directory = split[0]
+    filename = split[1]
     
     try:
         # extract month from title, error check formatting
@@ -62,7 +64,7 @@ def checkFile(filename):
             raise FileNameError
 
         # error check general formatting
-        accepted_format = "MonthlyReports\expedia_report_monthly_{}_{}.xlsx".\
+        accepted_format = "expedia_report_monthly_{}_{}.xlsx".\
             format(month, year)
         if filename == accepted_format:
             lg.info("File is in expected format")
@@ -77,28 +79,26 @@ def checkFile(filename):
                 if os.stat("file.lst").st_size != 0: 
                     contents = lst_file.read()
                     if filename in contents:
-                        lg.debug("File '{}' has been already processed".format(filename))
+                        lg.warning("File '{}' has been already processed".format(filename))
                         raise DuplicateError
                     else: pass
                 else: pass
 
-        return filename
         
     except UnboundLocalError:
-        lg.info("File MONTH is not in expected format. Moving to error folder.")
+        lg.error("UnboundLocalError: File MONTH is not in expected format. Moving to error folder.")
         if not os.path.exists(error_directory):
             os.mkdir(error_directory)
-        shutil.move(filename, error_directory)
-        lg.info("File moved to error folder.")
-            
+        shutil.move(path, error_directory)
+        lg.warning("File moved to error folder.")
 
     except FileNameError:
-        lg.info("File NAME is not in expected format. Moving to error folder.")
+        lg.error("FileNameError: File NAME is not in expected format. Moving to error folder.")
         if not os.path.exists(error_directory):
             os.mkdir(error_directory)
-        shutil.move(filename, error_directory)
-        lg.info("File moved to error folder.")
+        shutil.move(path, error_directory)
+        lg.warning("File moved to error folder.")
     
     except DuplicateError:
-        lg.info("File has already been processed.")
-        lg.info("Skipping report.")        
+        lg.error("DuplicateError: File has already been processed.")
+        lg.warning("Skipping report.")        
