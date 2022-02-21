@@ -61,16 +61,17 @@ def checkFile(path):
         # extract year from title, error check formatting
         year = int(''.join(list(filter(str.isdigit, filename))))
         if len(str(year)) != 4 or str(year)[:2] != '20':
+            lg.error("File Year: {} \nExpected Format: 20**".format(year))
             raise FileNameError
 
         # error check general formatting
         accepted_format = "expedia_report_monthly_{}_{}.xlsx".\
             format(month, year)
         if filename == accepted_format:
-            lg.info("File is in expected format")
+            lg.debug("File is in expected format")
             pass
         else:
-            lg.debug("File Name:{} \nExpected Format:{}".format(filename, accepted_format))
+            lg.error("File Name: {} \nExpected Format: {}".format(filename, accepted_format))
             raise FileNameError
         
         # error check if file in file.lst
@@ -84,6 +85,7 @@ def checkFile(path):
                     else: pass
                 else: pass
 
+        return month, month_val, year
         
     except UnboundLocalError:
         lg.error("UnboundLocalError: File MONTH is not in expected format. Moving to error folder.")

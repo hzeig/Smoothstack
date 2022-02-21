@@ -36,6 +36,9 @@ lg.basicConfig(
 # Print full report into .txt file 
 # Append file name to file.lst
 
+# NitPicking :
+# - fix months / no need for month val
+
 class Error(Exception):
     """Base class for other exceptions"""
     pass
@@ -54,11 +57,15 @@ def createReport(path):
 
     try:
         if checkFile(path):
-            pass            
+            month, month_val, year = checkFile(path)
+            date_obj = [month, month_val, year]
         else:
             raise CheckFailError
+
         
-        summary = summary(report)
+        
+        summary = summaryReport(path, date_obj)
+        promoters = promoterReport(path, date_obj)
 
         
         with open("file.lst", "a") as lst_file:
