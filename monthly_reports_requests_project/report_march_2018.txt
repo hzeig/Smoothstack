@@ -1,0 +1,12 @@
+Full Report for March, 2018
+
+Summary Report March, 2018: 
+                Calls Offered: 22343 
+                Abandon after 30s: 3.05% 
+                FCR: 86.0% 
+                DSAT: 18.0% 
+                CSAT: 74.4% 
+VOC Report march: 
+                Promoters: 279, good (>200), 
+                Passives: 21, bad (<100), 
+                Decractors: 33, bad (<100), 

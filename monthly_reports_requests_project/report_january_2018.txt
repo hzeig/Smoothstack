@@ -1,0 +1,12 @@
+Full Report for January, 2018
+
+Summary Report January, 2018: 
+                Calls Offered: 16915 
+                Abandon after 30s: 2.32% 
+                FCR: 86.5% 
+                DSAT: 14.2% 
+                CSAT: 78.3% 
+VOC Report january: 
+                Promoters: 256, good (>200), 
+                Passives: 86, bad (<100), 
+                Decractors: 86, bad (<100), 

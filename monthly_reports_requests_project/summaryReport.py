@@ -35,11 +35,17 @@ def summaryReport(path, date_obj):
             for cell in column:
                 if isinstance(cell.value, datetime.date):
                     cell_date = cell.value.strftime("%B, %Y")
-                    lg.debug("Comparing {} to {}".format(cell_date, date))
+                    lg.debug("Comparing {} to {}".format(cell_date, date.capitalize()))
                     if cell_date.lower() == date:
                         row = cell.row
                         lg.info("{} found in row {} of file.".format(date.capitalize(), row))
                         break
+                    else:
+                        continue
+                    break
+                else:
+                    continue
+                break
 
 
         lg.info("Collecting data.")

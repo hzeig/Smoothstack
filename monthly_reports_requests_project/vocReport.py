@@ -32,7 +32,7 @@ def vocReport(path, date_obj):
     columns = ws.iter_cols(min_row=1, max_row=1, min_col=2, max_col=13)
     
     try:
-        lg.info("Locating data row for {}.".format(date))
+        lg.info("Locating data row for {}.".format(date.capitalize()))
         for column in columns:
             for cell in column:
                 # check if date exists as datetime object
@@ -43,14 +43,23 @@ def vocReport(path, date_obj):
                         col = cell.column
                         lg.info("{} data found in column {} of file.".format(date.capitalize(), col))
                         break
+                    else:
+                        continue
+                    break
                 # else:
                 #     lg.warning(DataMissingError("Date Missing Error: Unable to find {} in datetime format.".format(date)))
-                else: 
+                else:
                     # if no matching datetime object, search by month name
                     string = str(cell.value)
                     lg.debug("Comparing string {} to {}".format(string, month.capitalize()))
                     if string.lower() == month:
                         col = cell.column
+                        lg.info("{} data found in column {} of file.".format(month, col))
+                        break
+                    else:
+                        continue
+                    break
+                        
                     # else:
                     #     lg.error(DateMissingError("Date Missing Error: Unable to find {} in string format.".format(date)))
 
@@ -67,21 +76,26 @@ def vocReport(path, date_obj):
                     data.append(cell.value)
                 else:
                     pass
+
         lg.info("Data collected.")
 
         lg.info("Analyzing data.")
         status = []
-        for value in data:
-            if value.index == 1:
-                if value > 200:
+
+        i = 0
+        for i in range(len(data)):
+            if i == 0:
+                if data[i] > 200:
                     status.append('good (>200)')
                 else:
                     status.append('bad (<200)')
+                i += 1
             else:
-                if value > 100:
+                if data[i] > 100:
                     status.append('good (>100)')
                 else:
                     status.append('bad (<100)')
+                i += 1
 
         zipped_data = list(zip(data, status))
 
@@ -89,7 +103,7 @@ def vocReport(path, date_obj):
                 Promoters: {}, \n\
                 Passives: {}, \n\
                 Decractors: {}, "\
-                .format(cell_date, *list(map(lambda x: "{}, {}".format(x[0], x[1]), zipped_data)))
+                .format(month, *list(map(lambda x: "{}, {}".format(x[0], x[1]), zipped_data)))
         lg.info("Data successfully gathered.")
         lg.debug(report)
         
