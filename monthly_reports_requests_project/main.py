@@ -59,14 +59,15 @@ def createReport(path):
         if checkFile(path):
             month, year = checkFile(path)
             date_obj = [month, year]
+            lg.info("File for {} successfully checked.".format)
         else:
             raise CheckFailError
         
         # collect report data
-        if summaryReport(path, date_obj) and vocReport(path, date_obj):
+        try:
             summary = summaryReport(path, date_obj)
             voc = vocReport(path, date_obj)
-        else:
+        except:
             raise ReportFailError
 
         # create report file

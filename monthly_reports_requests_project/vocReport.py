@@ -25,28 +25,40 @@ def vocReport(path, date_obj):
     lg.info("Opened worksheet 'VOC Rolling Mom'.")
     
     lg.info("Gathering report data.")
-    reg_date_format = "{}, {}".format(date_obj[0], date_obj[1])
+    date = "{}, {}".format(date_obj[0], date_obj[1]) 
     month = date_obj[0]
+    
     data = []
     columns = ws.iter_cols(min_row=1, max_row=1, min_col=2, max_col=13)
+    
     try:
-        lg.info("Locating file date.")
+        lg.info("Locating data row for {}.".format(date))
         for column in columns:
             for cell in column:
                 # check if date exists as datetime object
                 if isinstance(cell.value, datetime.date):
                     cell_date = cell.value.strftime("%B, %Y")
-                    if cell_date.lower() == reg_date_format:
+                    lg.debug("Comparing datetime {} to {}".format(cell_date, date.capitalize()))
+                    if cell_date.lower() == date:
                         col = cell.column
-                        lg.info("Date data found in column {} of file.".format(column))
-                # if no matching datetime object, search by month name
-                else:
-                    if str(cell.value).lower() == month:
-                        col = cell.column
+                        lg.info("{} data found in column {} of file.".format(date.capitalize(), col))
+                        break
                 # else:
-                #     raise DateMissingError
+                #     lg.warning(DataMissingError("Date Missing Error: Unable to find {} in datetime format.".format(date)))
+                else: 
+                    # if no matching datetime object, search by month name
+                    string = str(cell.value)
+                    lg.debug("Comparing string {} to {}".format(string, month.capitalize()))
+                    if string.lower() == month:
+                        col = cell.column
+                    # else:
+                    #     lg.error(DateMissingError("Date Missing Error: Unable to find {} in string format.".format(date)))
+
+    except DateMissingError:
+        lg.error("DateMissingError: Date from file name not found in file.")
 
 
+    try:
         lg.info("Collecting data.")
         column_data = ws.iter_cols(min_row=4, max_row=9, min_col=col, max_col=col)
         for cells in column_data:
@@ -60,7 +72,7 @@ def vocReport(path, date_obj):
         lg.info("Analyzing data.")
         status = []
         for value in data:
-            if data.index == 1:
+            if value.index == 1:
                 if value > 200:
                     status.append('good (>200)')
                 else:
@@ -83,8 +95,5 @@ def vocReport(path, date_obj):
         
         return report
 
-    except DateMissingError:
-        lg.error("DateMissingError: Date from file name not found in file.")
-
-    # except DataMissingError:
-    # lg.error("DataMissingError: Data for file date not found.")
+    except DataMissingError:
+        lg.error("DataMissingError: Data for file date not found.")
